@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/NikitaNasevich/test_task_avito/db"
 	"github.com/NikitaNasevich/test_task_avito/helpers"
 	"github.com/NikitaNasevich/test_task_avito/log"
 	"github.com/joho/godotenv"
@@ -12,8 +13,13 @@ import (
 
 func main() {
 	_ = godotenv.Load()
-
 	var err error
+
+	if err = db.ConnectDatabase(); err != nil {
+		log.GetLogger().Errorf("Can't connect to database: %s", err.Error())
+		os.Exit(1)
+	}
+
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
