@@ -3,3 +3,46 @@ GET http://localhost:3000
 ###
 
 GET http://localhost:3000/ping
+
+###
+
+POST http://localhost:3000/v1/getBalance
+Content-Type: application/json
+
+{
+  "UserId": 2
+}
+
+###
+
+POST http://localhost:3000/v1/addBalance
+Content-Type: application/json
+
+{
+  "UserId": 5,
+  "Balance": -6.05
+}
+
+###
+
+POST http://localhost:3000/v1/reserveFunds
+Content-Type: application/json
+
+{
+  "UserId": 2,
+  "ServiceId": 0,
+  "OrderServiceId": 1,
+  "ReserveBalance": 6.05
+}
+
+###
+
+POST http://localhost:3000/v1/acceptProfit
+Content-Type: application/json
+
+{
+  "UserId": 2,
+  "ServiceId": 0,
+  "OrderServiceId": 1,
+  "ReserveBalance": 6.05
+}

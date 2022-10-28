@@ -25,8 +25,16 @@ func ConnectDatabase() (err error) {
 
 	db.SetConnMaxLifetime(time.Minute * time.Duration(helpers.GetEnvAsInt("DB_CONNECTION_MAX_LIFETIME", 10)))
 
+	db.MapperFunc(func(column string) string {
+		return column
+	})
+
 	if err = db.Ping(); err != nil {
 		return err
 	}
 	return nil
+}
+
+func Database() *sqlx.DB {
+	return db
 }

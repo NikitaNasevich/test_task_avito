@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/NikitaNasevich/test_task_avito/api"
 	"github.com/NikitaNasevich/test_task_avito/db"
 	"github.com/NikitaNasevich/test_task_avito/helpers"
 	"github.com/NikitaNasevich/test_task_avito/log"
@@ -21,6 +22,9 @@ func main() {
 	}
 
 	r := gin.Default()
+
+	api.AllApi(r)
+
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
