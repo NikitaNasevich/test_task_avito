@@ -17,7 +17,7 @@ func main() {
 	var err error
 
 	if err = db.ConnectDatabase(); err != nil {
-		log.GetLogger().Errorf("Can't connect to database: %s", err.Error())
+		log.GetLogger().Errorf("Can't connect to database : %s", err.Error())
 		os.Exit(1)
 	}
 

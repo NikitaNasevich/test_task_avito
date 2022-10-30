@@ -10,7 +10,7 @@ POST http://localhost:3000/v1/getBalance
 Content-Type: application/json
 
 {
-  "UserId": 2
+  "UserId": 1
 }
 
 ###
@@ -19,8 +19,8 @@ POST http://localhost:3000/v1/addBalance
 Content-Type: application/json
 
 {
-  "UserId": 5,
-  "Balance": -6.05
+  "UserId": 1,
+  "Balance": 6.05
 }
 
 ###

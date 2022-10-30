@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  app:
+    container_name: avito_go
+    build: .
+    ports:
+      - "3000:3000"
+    restart: on-failure
+    depends_on:
+      - mysql
+    networks:
+      - fullstack
+    env_file:
+      - .env
+    environment:
+      - PORT=3000
+      - DATABASE=bestuser:bestuser@(mysql:3306)/test_avito
+
+  mysql:
+    image: mysql:latest
+
+    container_name: full_db_mysql
+    environment:
+      - MYSQL_USER=bestuser
+      - MYSQL_PASSWORD=bestuser
+      - MYSQL_DATABASE=test_avito
+      - MYSQL_ROOT_PASSWORD=12345
+      - MYSQL_RANDOM_ROOT_PASSWORD=NO
+      - MYSQL_ALLOW_EMPTY_PASSWORD=NO
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./db/mysql:/docker-entrypoint-initdb.d/
+      - ./db/mysqlVolume:/var/lib/mysql
+    networks:
+      - fullstack
+
+networks:
+  fullstack:
+    driver: bridge
+
+
+
