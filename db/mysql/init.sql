@@ -1,7 +1,7 @@
 CREATE TABLE customer
 (
     customer_id bigint NOT NULL AUTO_INCREMENT,
-    balance numeric(50, 10) DEFAULT '0',
+    balance numeric(50, 10),
 
     PRIMARY KEY(customer_id),
     CHECK (balance >= 0)
