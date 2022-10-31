@@ -39,6 +39,11 @@ func AddBalanceMeddleware(c *gin.Context) {
 		return
 	}
 
+	if req.Balance <= 0 {
+		c.AbortWithStatusJSON(400, response.NewErrorResponse("Balance must be above 0", 3))
+		return
+	}
+
 	c.Set("UserId", req.UserId)
 	c.Set("Balance", req.Balance)
 }

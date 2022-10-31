@@ -25,6 +25,11 @@ func GetBalanceApi(r *gin.Engine) {
 			c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 100))
 			return
 		}
+
+		if record.UserId == 0 {
+			c.AbortWithStatusJSON(500, response.NewErrorResponse("UserId not found", 101))
+			return
+		}
 		c.JSON(200, record)
 	})
 
@@ -41,8 +46,8 @@ func AddBalanceApi(r *gin.Engine) {
 
 		var record models.GetBalanceEntry
 		var err error
-		if err = db.Database().Get(&record, "SELECT customer_id, balance \nFROM customer\nWHERE customer_id = ?", userId); err != nil && err != sql.ErrNoRows {
-			c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 101))
+		if err = db.Database().Get(&record, "SELECT customer_id, IF(balance IS NULL, 0, balance) AS balance\nFROM customer\nWHERE customer_id = ?", userId); err != nil && err != sql.ErrNoRows {
+			c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 102))
 			return
 		}
 
@@ -51,7 +56,7 @@ func AddBalanceApi(r *gin.Engine) {
 		record2.UserId = record.UserId
 
 		if _, err = db.Database().NamedExec("UPDATE customer SET balance=:Balance WHERE customer_id= :UserId", record2); err != nil {
-			c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 102))
+			c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 103))
 			return
 		}
 
@@ -76,7 +81,7 @@ func ReserveFundsApi(r *gin.Engine) {
 		recordWithdraw.Balance = reserveBalance
 
 		if _, err = db.Database().NamedExec("UPDATE customer SET balance= balance - :Balance WHERE customer_id= :UserId", recordWithdraw); err != nil {
-			c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 103))
+			c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 104))
 			return
 		} else {
 			var recordReserve models.ReserveFundsEntry
@@ -86,7 +91,7 @@ func ReserveFundsApi(r *gin.Engine) {
 			recordReserve.Balance = reserveBalance
 
 			if _, err = db.Database().NamedExec("INSERT INTO reserve (customer_id, service_id, order_id, summ)\nVALUES (:UserId, :ServiceId, :OrderServiceId, :Balance)\n    ", recordReserve); err != nil {
-				c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 104))
+				c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 105))
 				return
 			}
 		}
@@ -108,15 +113,12 @@ func AcceptProfitApi(r *gin.Engine) {
 		acceptProfit.Balance = c.GetFloat64("Balance")
 		acceptProfit.Date = time.Now()
 
-		if _, err = db.Database().NamedExec("INSERT INTO profit (receiving_date, summ, order_id)\nVALUES "+
-			"(:Date, :Balance, (SELECT order_id \n                         FROM order_service\n                   "+
-			"      WHERE service_id = :ServiceId\n                         AND customer_id = :User_id\n            "+
-			"             AND summ = :Balance\n                         LIMIT 1))", acceptProfit); err != nil {
-			c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 105))
+		if _, err = db.Database().NamedExec("INSERT INTO profit (receiving_date, summ, order_id)\nVALUES (:Date, :Balance, (SELECT order_id \n                         FROM reserve\n                         WHERE service_id = :ServiceId\n                         AND customer_id = :UserId\n                         AND summ = :Balance\n                         LIMIT 1));\n", acceptProfit); err != nil {
+			c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 106))
 			return
 		} else {
-			if _, err = db.Database().NamedExec("UPDATE reserve \nSET summ = summ - :Balance", acceptProfit); err != nil {
-				c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 106))
+			if _, err = db.Database().NamedExec("UPDATE reserve \nSET summ = summ - :Balance\nWHERE customer_id = :UserId\nAND service_id = :ServiceId\nAND summ = :Balance\n", acceptProfit); err != nil {
+				c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 107))
 				return
 			}
 		}
