@@ -26,3 +26,10 @@ type AcceptProfitEntry struct {
 	Date           time.Time
 	Balance        float64
 }
+
+type CancelReserveFundsEntry struct {
+	UserId         int64
+	ServiceId      int64
+	OrderServiceId int64
+	Balance        float64
+}

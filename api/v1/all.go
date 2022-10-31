@@ -99,6 +99,42 @@ func ReserveFundsApi(r *gin.Engine) {
 	})
 }
 
+func CancelReserveFundsApi(r *gin.Engine) {
+
+	group := r.Group("v1")
+	group.Use(middlewares.ReserveFundsMeddleware)
+	group.POST("cancelReserveFunds", func(c *gin.Context) {
+
+		userId := c.GetInt64("UserId")
+		serviceId := c.GetInt64("ServiceId")
+		orderServiceId := c.GetInt64("OrderServiceId")
+		reserveBalance := c.GetFloat64("ReserveBalance")
+
+		var recordWithdraw models.AddBalanceEntry
+		var err error
+
+		recordWithdraw.UserId = userId
+		recordWithdraw.Balance = reserveBalance
+
+		if _, err = db.Database().NamedExec("UPDATE customer SET balance= balance + :Balance WHERE customer_id= :UserId", recordWithdraw); err != nil {
+			c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 108))
+			return
+		} else {
+			var recordReserve models.ReserveFundsEntry
+			recordReserve.UserId = userId
+			recordReserve.ServiceId = serviceId
+			recordReserve.OrderServiceId = orderServiceId
+			recordReserve.Balance = reserveBalance
+
+			if _, err = db.Database().NamedExec("UPDATE reserve \nSET summ = summ - :Balance\nWHERE customer_id = :UserId\nAND service_id = :ServiceId\nAND summ = :Balance\n", recordReserve); err != nil {
+				c.AbortWithStatusJSON(500, response.NewErrorResponse(err.Error(), 109))
+				return
+			}
+		}
+
+	})
+}
+
 func AcceptProfitApi(r *gin.Engine) {
 
 	group := r.Group("v1")

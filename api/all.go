@@ -9,5 +9,6 @@ func AllApi(r *gin.Engine) {
 	v1.GetBalanceApi(r)
 	v1.AddBalanceApi(r)
 	v1.ReserveFundsApi(r)
+	v1.CancelReserveFundsApi(r)
 	v1.AcceptProfitApi(r)
 }

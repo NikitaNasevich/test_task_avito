@@ -38,6 +38,17 @@ Content-Type: application/json
 
 ###
 
+POST http://localhost:3000/v1/cancelReserveFunds
+Content-Type: application/json
+
+{
+  "UserId": 1,
+  "ServiceId": 1,
+  "OrderServiceId": 1,
+  "ReserveBalance": 10
+}
+###
+
 POST http://localhost:3000/v1/acceptProfit
 Content-Type: application/json
 

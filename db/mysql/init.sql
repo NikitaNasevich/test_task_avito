@@ -61,8 +61,8 @@ CREATE TABLE history
 (
     history_id   bigint NOT NULL AUTO_INCREMENT,
     customer_id  bigint NOT NULL,
-    summ         numeric(50, 10),
-    service_id   bigint NOT NULL,
+    summ         numeric(50, 10) NOT NULL ,
+    service_id   bigint,
     execute_date date   NOT NULL,
 
     PRIMARY KEY (history_id),

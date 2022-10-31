@@ -205,6 +205,59 @@ Content-Length: 0
 
 <Response body is empty>
 
+# Метод разрезервирования средств с основного баланса на отдельном счете. Принимает id пользователя, ИД услуги, ИД заказа, стоимость.
+
+Запрос (id заказа = 0):
+
+POST /v1/cancelReserveFunds HTTP/1.1
+Host: 0.0.0.0:3000
+Content-Type: application/json
+Content-Length: 87
+
+{
+  "UserId": 1,
+  "ServiceId": 1,
+  "OrderServiceId": 0,
+  "ReserveBalance": 10
+}
+
+Ответ:
+
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=utf-8
+Date: Mon, 31 Oct 2022 15:12:15 GMT
+Content-Length: 117
+
+{
+  "Message": "Key: 'OrderServiceId' Error:Field validation for 'OrderServiceId' failed on the 'required' tag",
+  "Code": 1
+}
+
+---------------------------------------------------------------------------------------------------------
+
+Запрос (все данные валидны):
+
+POST /v1/cancelReserveFunds HTTP/1.1
+Host: 0.0.0.0:3000
+Content-Type: application/json
+Content-Length: 87
+
+{
+  "UserId": 1,
+  "ServiceId": 1,
+  "OrderServiceId": 1,
+  "ReserveBalance": 10
+}
+
+Ответ:
+
+HTTP/1.1 200 OK
+Date: Mon, 31 Oct 2022 15:15:16 GMT
+Content-Length: 0
+
+<Response body is empty>
+
+
 # Метод признания выручки – списывает из резерва деньги, добавляет данные в отчет для бухгалтерии.Принимает id пользователя, ИД услуги, ИД заказа, сумму.
 
 Запрос (id пользователя с балансом = null):
